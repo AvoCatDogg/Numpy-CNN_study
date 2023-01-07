@@ -6,7 +6,7 @@ Version: 1.0
 Date: June 12th, 2018
 '''
 
-import numpy as np
+import numpy as np #numpy를 import 해줌
 
 from CNN.utils import *
 
@@ -18,12 +18,15 @@ def convolutionBackward(dconv_prev, conv_in, filt, s):
     '''
     Backpropagation through a convolutional layer. 
     '''
+
     (n_f, n_c, f, _) = filt.shape
     (_, orig_dim, _) = conv_in.shape
+    
     ## initialize derivatives
     dout = np.zeros(conv_in.shape) 
     dfilt = np.zeros(filt.shape)
     dbias = np.zeros((n_f,1))
+
     for curr_f in range(n_f):
         # loop through all filters
         curr_y = out_y = 0

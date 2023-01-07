@@ -5,9 +5,10 @@ Author: Alejandro Escontrela
 Version: V.1.
 Date: June 12th, 2018
 '''
-from CNN.forward import *
+
+from CNN.forward import * #앞서 코드를 작성한  forward를 import함
 import numpy as np
-import gzip
+import gzip  #파일 압축할때 쓰는 응용소프트웨어
 
 #####################################################
 ################## Utility Methods ##################
@@ -17,6 +18,8 @@ def extract_data(filename, num_images, IMAGE_WIDTH):
     '''
     Extract images by reading the file bytestream. Reshape the read values into a 3D matrix of dimensions [m, h, w], where m 
     is the number of training examples.
+    이미지를 파일의 Bytestream을 읽음으로서 추출한다. 읽어준 값을 [m,h,w]의 3차원 행렬로 만들어준다. 
+    m은 traning examples의 수를 의미한다.  
     '''
     print('Extracting', filename)
     with gzip.open(filename) as bytestream:
@@ -25,11 +28,16 @@ def extract_data(filename, num_images, IMAGE_WIDTH):
         data = np.frombuffer(buf, dtype=np.uint8).astype(np.float32)
         data = data.reshape(num_images, IMAGE_WIDTH*IMAGE_WIDTH)
         return data
+    #이쪽 위에부분들이 이해가 안됨. gzip.read(숫자) 에서 숫자의 의미를 모르겠다.
+    #np.frombuffer은 binary형태의 데이터를 array로 받는것
 
 def extract_labels(filename, num_images):
+
     '''
     Extract label into vector of integer values of dimensions [m, 1], where m is the number of images.
+    [m,1] 차원의 행렬로 label을 추출한다. m은 image의 수이다.
     '''
+
     print('Extracting', filename)
     with gzip.open(filename) as bytestream:
         bytestream.read(8)
@@ -37,14 +45,14 @@ def extract_labels(filename, num_images):
         labels = np.frombuffer(buf, dtype=np.uint8).astype(np.int64)
     return labels
 
-def initializeFilter(size, scale = 1.0):
-    stddev = scale/np.sqrt(np.prod(size))
+def initializeFilter(size, scale = 1.0): #필터를 초기화 하는 코드
+    stddev = scale/np.sqrt(np.prod(size)) # size라는 array의 요소들을 곱한 값의 sqrt를 크기로 나누어준다.
     return np.random.normal(loc = 0, scale = stddev, size = size)
 
-def initializeWeight(size):
+def initializeWeight(size): #가중치를 초기화 한다.
     return np.random.standard_normal(size=size) * 0.01
 
-def nanargmax(arr):
+def nanargmax(arr): 
     idx = np.nanargmax(arr)
     idxs = np.unravel_index(idx, arr.shape)
     return idxs    
