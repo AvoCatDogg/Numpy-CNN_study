@@ -5,6 +5,7 @@ Author: Alejandro Escontrela
 Version: V.1.
 Date: June 12th, 2018
 '''
+
 from CNN.network import *
 from CNN.utils import *
 
@@ -16,6 +17,7 @@ import pickle
 parser = argparse.ArgumentParser(description='Train a convolutional neural network.')
 parser.add_argument('save_path', metavar = 'Save Path', help='name of file to save parameters in.')
 
+#학습을 시키는 main이다.
 if __name__ == '__main__':
     
     args = parser.parse_args()
