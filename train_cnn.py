@@ -18,6 +18,7 @@ parser = argparse.ArgumentParser(description='Train a convolutional neural netwo
 parser.add_argument('save_path', metavar = 'Save Path', help='name of file to save parameters in.')
 
 #학습을 시키는 main이다.
+
 if __name__ == '__main__':
     
     args = parser.parse_args()
@@ -37,8 +38,9 @@ if __name__ == '__main__':
 
     # Get test data
     m =10000
-    X = extract_data('t10k-images-idx3-ubyte.gz', m, 28)
-    y_dash = extract_labels('t10k-labels-idx1-ubyte.gz', m).reshape(m,1)
+    X = extract_data('./Numpy-CNN_study/t10k-images-idx3-ubyte.gz', m, 28)
+    y_dash = extract_labels('./Numpy-CNN_study/t10k-labels-idx1-ubyte.gz', m).reshape(m,1)
+    
     # Normalize the data
     X-= int(np.mean(X)) # subtract mean
     X/= int(np.std(X)) # divide by standard deviation
