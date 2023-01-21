@@ -45,6 +45,7 @@ def convolution(image, filt, bias, s=1): #convolution함수를 정의해줌
             while curr_x + f <= in_dim:#이미지 x길이보다 필터+현재 필터 위치가 작은 경우에 실행
                 out[curr_f, out_y, out_x] = np.sum(filt[curr_f] * image[:,curr_y:curr_y+f, curr_x:curr_x+f]) + bias[curr_f] 
                 #위 과정이 합성곱의 과정이다. current f값에서의 filt값을 f크기의 격자에 들어있는 image에 모든 항 : 과 더하고, 이에 bias를 더함
+
                 curr_x += s #현재 필터 위치에 stride를 더해줌
                 out_x += 1 #다음 결과값을 받을 out행렬의 x위치를 정해줌.
             curr_y += s #위와 같음
@@ -81,6 +82,7 @@ def maxpool(image, f=2, s=2): #maxpool은 앞서 필터를 거친 값에서 karn
                 out_x += 1
             curr_y += s
             out_y += 1
+            
     return downsampled
 
 def softmax(X): #소프트맥스 함수의 정의

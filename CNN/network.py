@@ -16,7 +16,7 @@ from tqdm import tqdm
 ############### Building The Network ################
 #####################################################
 
-def conv(image, label, params, conv_s, pool_f, pool_s):
+def conv(image, label, params, conv_s, pool_f, pool_s): #convolution 과정을 정의하는 함수이다!
     
     [f1, f2, w3, w4, b1, b2, b3, b4] = params 
     
@@ -51,6 +51,7 @@ def conv(image, label, params, conv_s, pool_f, pool_s):
     ################################################
     ############# Backward Operation ###############
     ################################################
+    
     dout = probs - label # derivative of loss w.r.t. final dense layer output
     dw4 = dout.dot(z.T) # loss gradient of final dense layer weights
     db4 = np.sum(dout, axis = 1).reshape(b4.shape) # loss gradient of final dense layer biases
@@ -186,20 +187,24 @@ def adamGD(batch, num_classes, lr, dim, n_c, beta1, beta2, params, cost):
 ##################### Training ######################
 #####################################################
 
-def train(num_classes = 10, lr = 0.01, beta1 = 0.95, beta2 = 0.99, img_dim = 28, img_depth = 1, f = 5, num_filt1 = 8, num_filt2 = 8, batch_size = 32, num_epochs = 2, save_path = 'params.pkl'):
+def train(num_classes = 10, lr = 0.01, beta1 = 0.95, beta2 = 0.99, img_dim = 32, img_depth = 3, f = 5, num_filt1 = 8, num_filt2 = 8, batch_size = 32, num_epochs = 2, save_path = 'params.pkl'):
 
     # training data 훈련시키는 데이터이다.
-    m =50000
-    X = extract_data('./Numpy-CNN_study/train-images-idx3-ubyte.gz', m, img_dim)
-    y_dash = extract_labels('./Numpy-CNN_study/train-labels-idx1-ubyte.gz', m).reshape(m,1)
+    m =10000
+    X = extract_data('./Numpy-CNN_study/cifar-10-batches-py/data_batch_1', m, img_dim, img_depth)
+    y_dash = extract_labels('./Numpy-CNN_study/cifar-10-batches-py/data_batch_1').reshape(m,1)
+
     X-= int(np.mean(X))
     X/= int(np.std(X))
+    '''
     train_data = np.hstack((X,y_dash))
     
     np.random.shuffle(train_data)
+    '''
 
     ## Initializing all the parameters
     f1, f2, w3, w4 = (num_filt1 ,img_depth,f,f), (num_filt2 ,num_filt1,f,f), (128,800), (10, 128)
+
     f1 = initializeFilter(f1)
     f2 = initializeFilter(f2)
     w3 = initializeWeight(w3)
@@ -217,8 +222,8 @@ def train(num_classes = 10, lr = 0.01, beta1 = 0.95, beta2 = 0.99, img_dim = 28,
     print("LR:"+str(lr)+", Batch Size:"+str(batch_size))
 
     for epoch in range(num_epochs):
-        np.random.shuffle(train_data)
-        batches = [train_data[k:k + batch_size] for k in range(0, train_data.shape[0], batch_size)]
+        #np.random.shuffle(train_data)
+        batches = [X[k:k + batch_size] for k in range(0, X.shape[0], batch_size)]
 
         t = tqdm(batches)
         for x,batch in enumerate(t):
