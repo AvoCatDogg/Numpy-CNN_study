@@ -16,9 +16,9 @@ if __name__ == '__main__':
     [f1, f2, w3, w4, b1, b2, b3, b4] = params
     
     # Get test data
-    m =10000
-    X = extract_data('t10k-images-idx3-ubyte.gz', m, 28)
-    y_dash = extract_labels('t10k-labels-idx1-ubyte.gz', m).reshape(m,1)
+    m =10
+    X = extract_data('./Numpy-CNN_study/t10k-images-idx3-ubyte.gz', m, 28)
+    y_dash = extract_labels('./Numpy-CNN_study/t10k-labels-idx1-ubyte.gz', m).reshape(m,1)
     # Normalize the data
     X-= int(np.mean(X)) # subtract mean
     X/= int(np.std(X)) # divide by standard deviation

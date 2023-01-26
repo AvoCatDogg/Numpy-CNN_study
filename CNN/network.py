@@ -23,6 +23,7 @@ def conv(image, label, params, conv_s, pool_f, pool_s):
     ################################################
     ############## Forward Operation ###############
     ################################################
+
     conv1 = convolution(image, f1, b1, conv_s) # convolution operation
     conv1[conv1<=0] = 0 # pass through ReLU non-linearity
     
@@ -187,10 +188,10 @@ def adamGD(batch, num_classes, lr, dim, n_c, beta1, beta2, params, cost):
 
 def train(num_classes = 10, lr = 0.01, beta1 = 0.95, beta2 = 0.99, img_dim = 28, img_depth = 1, f = 5, num_filt1 = 8, num_filt2 = 8, batch_size = 32, num_epochs = 2, save_path = 'params.pkl'):
 
-    # training data
+    # training data 훈련시키는 데이터이다.
     m =50000
-    X = extract_data('train-images-idx3-ubyte.gz', m, img_dim)
-    y_dash = extract_labels('train-labels-idx1-ubyte.gz', m).reshape(m,1)
+    X = extract_data('./Numpy-CNN_study/train-images-idx3-ubyte.gz', m, img_dim)
+    y_dash = extract_labels('./Numpy-CNN_study/train-labels-idx1-ubyte.gz', m).reshape(m,1)
     X-= int(np.mean(X))
     X/= int(np.std(X))
     train_data = np.hstack((X,y_dash))
