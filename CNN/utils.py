@@ -23,12 +23,13 @@ def extract_data(filename, num_images, IMAGE_WIDTH, img_depth):
     이미지를 파일의 Bytestream을 읽음으로서 추출한다. 읽어준 값을 [m,h,w]의 3차원 행렬로 만들어준다. 
     m은 traning examples의 수를 의미한다.  
     '''
-
     print('Extracting', filename,'data')
     with open(filename, 'rb') as fo:
         dict = pickle.load(fo, encoding='bytes')
 
-    data = np.array(dict[b'data']).reshape(num_images, img_depth , IMAGE_WIDTH * IMAGE_WIDTH).astype(np.float32) #이미지 갯수, 색, 32 X 32
+    data = np.array(dict[b'data']).reshape(num_images , img_depth , IMAGE_WIDTH * IMAGE_WIDTH).astype(np.float32)
+
+    #data를 num_image(=m) x RGB(1024*3)의 크기로 만들어 줌!
 
     return data
 
@@ -67,6 +68,47 @@ def extract_labels(filename):
         labels = np.frombuffer(buf, dtype=np.uint8).astype(np.int64)
     return labels
     '''
+    
+def select_train_data(data_size, random, Scaling_Style):
+    data_list=[]
+    labels_list=[]
+
+    data_size=int(data_size)
+    img_count=int(data_size*10000)
+    number=np.array((1,2,3,4,5))
+    if random: 
+        np.random.shuffle(number)
+
+    for i in range(data_size):
+        with open(f'./Numpy-CNN_study/cifar-10-batches-py/data_batch_{number[i]}', 'rb') as fo:
+            dict = pickle.load(fo, encoding='bytes')
+        data = dict[b'data']
+        labels = dict[b'labels']
+        data_list.append(data)
+        labels_list.append(labels)
+        
+    data_arr=np.array(data_list).reshape(img_count , 3 , 1024).astype(np.float32)
+    labels_arr=np.array(labels_list).reshape(img_count , 1).astype(np.int64)
+
+    if Scaling_Style is 'minmax':
+        for i in range(3): #R G B 따로 Normalize해줌.
+            data_min = np.min(data_arr[:,i])
+            data_max = np.max(data_arr[:,i])
+            data_arr[:,i] = (data_arr[:,i] - data_min) / (data_max - data_min)
+
+    elif Scaling_Style is 'standard':
+        for i in range(3): #R G B 따로 Normalize해줌.
+            data_arr[:,i] = (data_arr[:,i] - np.mean(data_arr[:,i])) / np.std(data_arr[:,i])
+
+    else: 
+        for i in range(3): #R G B 따로 Normalize해줌.
+            data_arr[:,i] = (data_arr[:,i] - np.mean(data_arr[:,i])) / np.std(data_arr[:,i])
+    
+    data_arr=data_arr.reshape(img_count, 3 * 1024)
+    
+    train_data = np.hstack((data_arr,labels_arr))
+    return train_data
+
 
 def initializeFilter(size, scale = 1.0): #필터를 초기화 하는 코드
     stddev = scale/np.sqrt(np.prod(size)) # size라는 array의 요소들을 곱한 값의 sqrt를 크기로 나누어준다.

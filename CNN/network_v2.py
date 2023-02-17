@@ -1,21 +1,25 @@
 from CNN.forward import *
 from CNN.backward import *
-from CNN.utils import *
+from CNN.utils_v2 import *
 
 import numpy as np
 import pickle
 from tqdm import tqdm
+
 #####################################################
 ############### Building The Network ################
 #####################################################
 
+
 def conv(image, label, params, conv_s, pool_f, pool_s): #convolution 과정을 정의하는 함수이다!
     
     [f1, f2, w3, w4, b1, b2, b3, b4] = params 
-    
+
+
     ################################################
     ############## Forward Operation ###############
     ################################################
+
 
     conv1 = convolution(image, f1, b1, conv_s) # convolution operation
     conv1[conv1<=0] = 0 # pass through ReLU non-linearity
@@ -77,6 +81,7 @@ def adamGD(batch, num_classes, lr, dim, n_c, beta1, beta2, params, cost):
     '''
     update the parameters through Adam gradient descnet.
     '''
+
     [f1, f2, w3, w4, b1, b2, b3, b4] = params
     
     X = batch[:,0:-1] # get batch inputs
@@ -185,9 +190,12 @@ def train(num_classes = 10, lr = 0.01, beta1 = 0.95, beta2 = 0.99, img_dim = 32,
     # training data 훈련시키는 데이터이다.
     m =10000
     X = extract_data('./Numpy-CNN_study/cifar-10-batches-py/data_batch_1', m, img_dim, img_depth)
-    y_dash = extract_labels('./Numpy-CNN_study/train-labels-idx1-ubyte.gz', m).reshape(m,1)
-    X-= int(np.mean(X))
-    X/= int(np.std(X))
+    y_dash = extract_labels('./Numpy-CNN_study/cifar-10-batches-py/data_batch_1', m).reshape(m,1)
+    
+    for i in range(img_depth): #R G B 따로 Normalize해줌.
+        X[:,i]-= int(np.mean(X[:,i])) # subtract mean
+        X[:,i]/= int(np.std(X[:,i])) # divide by standard deviation
+        
     train_data = np.hstack((X,y_dash))
     
     np.random.shuffle(train_data)

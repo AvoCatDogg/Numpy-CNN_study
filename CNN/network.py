@@ -5,6 +5,7 @@ Author: Alejandro Escontrela
 Version: V.1.
 Date: June 12th, 2018
 '''
+
 from CNN.forward import *
 from CNN.backward import *
 from CNN.utils import *
@@ -187,24 +188,32 @@ def adamGD(batch, num_classes, lr, dim, n_c, beta1, beta2, params, cost):
 ##################### Training ######################
 #####################################################
 
-def train(num_classes = 10, lr = 0.01, beta1 = 0.95, beta2 = 0.99, img_dim = 32, img_depth = 3, f = 5, num_filt1 = 8, num_filt2 = 8, batch_size = 32, num_epochs = 2, save_path = 'params.pkl'):
+def train(num_classes = 10, lr = 0.1, beta1 = 0.95, beta2 = 0.99, img_dim = 32, img_depth = 3, f = 5, num_filt1 = 8, num_filt2 = 8, batch_size = 50, num_epochs = 10, save_path = 'params.pkl'):
 
     # training data 훈련시키는 데이터이다.
     m =10000
+    IMAGE_WIDTH = 32
+    img_depth = 3
+    data_size = 2 # datasize 는 이 값의 * 10000이라 생각하자. 즉, 열어보는 data_batch_n 파일의 갯수임. max =5
+
+    train_data = select_train_data(data_size = 2, random = True, Scaling_Style = 'standard')
+    '''
     X = extract_data('./Numpy-CNN_study/cifar-10-batches-py/data_batch_1', m, img_dim, img_depth)
     y_dash = extract_labels('./Numpy-CNN_study/cifar-10-batches-py/data_batch_1').reshape(m,1)
-
-    X-= int(np.mean(X))
-    X/= int(np.std(X))
-    '''
+    
+    for i in range(3): #R G B 따로 Normalize해줌.
+        X[:,i]-= int(np.mean(X[:,i])) # subtract mean
+        X[:,i]/= int(np.std(X[:,i])) # divide by standard deviation
+    
+    X=X.reshape(m,img_depth*img_dim*img_dim)
+    y=y_dash
     train_data = np.hstack((X,y_dash))
     
     np.random.shuffle(train_data)
     '''
-
+    
     ## Initializing all the parameters
-    f1, f2, w3, w4 = (num_filt1 ,img_depth,f,f), (num_filt2 ,num_filt1,f,f), (128,800), (10, 128)
-
+    f1, f2, w3, w4 = (num_filt1 ,img_depth,f,f), (num_filt2 ,num_filt1,f,f), (128,3200), (10, 128)
     f1 = initializeFilter(f1)
     f2 = initializeFilter(f2)
     w3 = initializeWeight(w3)
@@ -222,8 +231,8 @@ def train(num_classes = 10, lr = 0.01, beta1 = 0.95, beta2 = 0.99, img_dim = 32,
     print("LR:"+str(lr)+", Batch Size:"+str(batch_size))
 
     for epoch in range(num_epochs):
-        #np.random.shuffle(train_data)
-        batches = [X[k:k + batch_size] for k in range(0, X.shape[0], batch_size)]
+        np.random.shuffle(train_data)
+        batches = [train_data[k:k + batch_size] for k in range(0, train_data.shape[0], batch_size)]
 
         t = tqdm(batches)
         for x,batch in enumerate(t):

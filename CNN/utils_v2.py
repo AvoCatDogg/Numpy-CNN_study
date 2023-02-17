@@ -1,21 +1,25 @@
 from CNN.forward import * #앞서 코드를 작성한  forward를 import함
 import numpy as np
-import gzip  #파일 압축할때 쓰는 응용소프트웨어
+#import gzip  #파일 압축할때 쓰는 응용소프트웨어
 import matplotlib.pyplot as plt
 import pickle
 
-def extract_data(filename, num_images, IMAGE_WIDTH, img_depth):
+#####################################################
+################## Utility Methods ##################
+#####################################################
 
+def extract_data(filename, num_images, IMAGE_WIDTH, img_depth):
     print('Extracting', filename,'data')
     with open(filename, 'rb') as fo:
         dict = pickle.load(fo, encoding='bytes')
 
     data = np.array(dict[b'data']).reshape(num_images, img_depth , IMAGE_WIDTH * IMAGE_WIDTH).astype(np.float32)
+    #data를 num_image(=m) x RGB(1024*3)의 크기로 만들어 줌!
 
     return data
 
-def extract_labels(filename):
 
+def extract_labels(filename):
     print('Extracting', filename,'data')
     with open(filename, 'rb') as fo:
         dict = pickle.load(fo, encoding='bytes')
@@ -24,17 +28,21 @@ def extract_labels(filename):
     
     return labels
 
+
 def initializeFilter(size, scale = 1.0): #필터를 초기화 하는 코드
     stddev = scale/np.sqrt(np.prod(size)) # size라는 array의 요소들을 곱한 값의 sqrt를 크기로 나누어준다.
     return np.random.normal(loc = 0, scale = stddev, size = size)
 
+
 def initializeWeight(size): #가중치를 초기화 한다.
     return np.random.standard_normal(size=size) * 0.01
+
 
 def nanargmax(arr): 
     idx = np.nanargmax(arr)
     idxs = np.unravel_index(idx, arr.shape)
     return idxs    
+
 
 def predict(image, f1, f2, w3, w4, b1, b2, b3, b4, conv_s = 1, pool_f = 2, pool_s = 2):
     '''
