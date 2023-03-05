@@ -5,7 +5,6 @@ Author: Alejandro Escontrela
 Version: V.1.
 Date: June 12th, 2018
 '''
-
 from CNN.forward import *
 from CNN.backward import *
 from CNN.utils import *
@@ -17,14 +16,14 @@ from tqdm import tqdm
 ############### Building The Network ################
 #####################################################
 
-def conv(image, label, params, conv_s, pool_f, pool_s): #convolution 과정을 정의하는 함수이다!
+def conv(image, label, params, conv_s, pool_f, pool_s):
     
     [f1, f2, w3, w4, b1, b2, b3, b4] = params 
     
     ################################################
     ############## Forward Operation ###############
     ################################################
-
+    
     conv1 = convolution(image, f1, b1, conv_s) # convolution operation
     conv1[conv1<=0] = 0 # pass through ReLU non-linearity
     
@@ -52,7 +51,6 @@ def conv(image, label, params, conv_s, pool_f, pool_s): #convolution 과정을 �
     ################################################
     ############# Backward Operation ###############
     ################################################
-    
     dout = probs - label # derivative of loss w.r.t. final dense layer output
     dw4 = dout.dot(z.T) # loss gradient of final dense layer weights
     db4 = np.sum(dout, axis = 1).reshape(b4.shape) # loss gradient of final dense layer biases
@@ -188,32 +186,20 @@ def adamGD(batch, num_classes, lr, dim, n_c, beta1, beta2, params, cost):
 ##################### Training ######################
 #####################################################
 
-def train(num_classes = 10, lr = 0.1, beta1 = 0.95, beta2 = 0.99, img_dim = 32, img_depth = 3, f = 5, num_filt1 = 8, num_filt2 = 8, batch_size = 50, num_epochs = 10, save_path = 'params.pkl'):
+def train(num_classes = 10, lr = 0.01, beta1 = 0.95, beta2 = 0.99, img_dim = 28, img_depth = 1, f = 5, num_filt1 = 8, num_filt2 = 8, batch_size = 32, num_epochs = 2, save_path = 'params.pkl'):
 
-    # training data 훈련시키는 데이터이다.
-    m =10000
-    IMAGE_WIDTH = 32
-    img_depth = 3
-    data_size = 2 # datasize 는 이 값의 * 10000이라 생각하자. 즉, 열어보는 data_batch_n 파일의 갯수임. max =5
-
-    train_data = select_train_data(data_size = 2, random = True, Scaling_Style = 'standard')
-    '''
-    X = extract_data('./Numpy-CNN_study/cifar-10-batches-py/data_batch_1', m, img_dim, img_depth)
-    y_dash = extract_labels('./Numpy-CNN_study/cifar-10-batches-py/data_batch_1').reshape(m,1)
-    
-    for i in range(3): #R G B 따로 Normalize해줌.
-        X[:,i]-= int(np.mean(X[:,i])) # subtract mean
-        X[:,i]/= int(np.std(X[:,i])) # divide by standard deviation
-    
-    X=X.reshape(m,img_depth*img_dim*img_dim)
-    y=y_dash
+    # training data
+    m =50000
+    X = extract_data('train-images-idx3-ubyte.gz', m, img_dim)
+    y_dash = extract_labels('train-labels-idx1-ubyte.gz', m).reshape(m,1)
+    X-= int(np.mean(X))
+    X/= int(np.std(X))
     train_data = np.hstack((X,y_dash))
     
     np.random.shuffle(train_data)
-    '''
-    
+
     ## Initializing all the parameters
-    f1, f2, w3, w4 = (num_filt1 ,img_depth,f,f), (num_filt2 ,num_filt1,f,f), (128,3200), (10, 128)
+    f1, f2, w3, w4 = (num_filt1 ,img_depth,f,f), (num_filt2 ,num_filt1,f,f), (128,800), (10, 128)
     f1 = initializeFilter(f1)
     f2 = initializeFilter(f2)
     w3 = initializeWeight(w3)
